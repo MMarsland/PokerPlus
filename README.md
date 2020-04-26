@@ -1,10 +1,13 @@
-#PokerPlus
+# PokerPlus
 
 A Poker App for friendly and simple poker play.
 
 Feel free to use this app for your own friends once it's ready or make your own brach and develop your own version!
 
-##HOW TO SET-UP:
+This version is based off (and using some functionality/graphics) developed by nilssonopel. Check out his single player app here: https://js-css-poker.sourceforge.io/
+and pay him his due respects for his amazing work and for giving me a starting point and really doing all the hardwork for me!
+
+## HOW TO SET-UP:
 N/A - I'll write this when the app is actually functionally complete. Baby steps..
 
 Just posting this version so Trevor can experiement with adding video chat functionality.
@@ -12,7 +15,7 @@ Just posting this version so Trevor can experiement with adding video chat funct
 __Version__
 Pre-Aplha
 
-###TODO:
+### TODO:
 
 __Bugs:__
 --FUNCTIONALITY--
