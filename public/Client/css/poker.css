@@ -1,0 +1,539 @@
+#close {
+  position:absolute;
+  top:10px;
+  left:10px;
+  height:20px;
+  width:20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: red;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+#refresh {
+  position:absolute;
+  top:10px;
+  left:40px;
+  height:20px;
+  width:20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: red;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.poker.page {
+  display: none;
+  height: 100%;
+  width:100%;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.poker .game {
+  display: flex;
+  height:100%;
+  flex-direction: column;
+  width:860px;
+}
+
+.poker .other {
+  display: flex;
+  height:100%;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+#poker_area {
+  display: inline-flex;
+  height:475px;
+  width:860px;
+}
+
+#chat_area {
+  display: inline-flex;
+  flex-grow: 1;
+  height: 475px;
+}
+
+#action_area {
+  display:flex;
+  width:860px;
+  flex-grow: 1;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  visibility: hidden;
+}
+
+#settings_area {
+  display:flex;
+  height: 300px;
+  justify-content: flex-end;
+}
+
+
+
+
+/* outdated */
+
+
+.poker-table {
+    background-repeat: no-repeat;
+    margin-left: 60px;
+    margin-top: 35px;
+    position:relative;
+    height: 411px;
+    width: 745px;
+    background-image: url('../../Shared/images/poker_table.png');
+}
+
+.seat {
+    height: 150px;
+    position: absolute;
+    width: 150px;
+}
+
+#dealer-button {
+    background-image: url('../../Shared/images/dealerbutton.png');
+    background-repeat: no-repeat;
+    background-size: 100%;
+    height: 19px;
+    position: absolute;
+    width: 24px;
+}
+
+#dealer-button.seat-button {
+  visibility: hidden;
+}
+
+.name-chips {
+    background-color: gray;
+    border-radius: 4px;
+    color: white;
+    font-size: 14px;
+    height: 33px;
+    position: absolute;
+    text-align: center;
+    top: 65px;
+    width: 150px;
+}
+
+.name-chips:hover > .userId {
+  display: block;
+}
+
+.userId {
+  display: none;
+  z-index: 20;
+  position: absolute;
+  border-radius: 4px;
+  top: 0px;
+  height: 17px;
+  background: black;
+  width: 150px;
+}
+
+.player-name {
+    width: 100%;
+    white-space: nowrap;
+}
+
+.card {
+    background-image: url('../../Shared/images/transparent-outline.png');
+    background-size: 100%;
+    border-radius: 4px;
+    height: 73px;
+    width: 53px;
+}
+
+/* +improve fix magnify
+.card:hover {
+  background-size: 150%;
+  border-radius: 6px;
+  height: 109px;
+  width: 79px;
+  z-index:5;
+}*/
+
+.holecards {
+    float: left;
+    height: 73px;
+    position: absolute;
+    top: 3px;
+    width: 100%;
+    overflow:visible;
+}
+
+.holecard1 {
+    left: 21px;
+    position: absolute;
+}
+
+.holecard2 {
+    left: 76px;
+    position: absolute;
+}
+
+
+.bet {
+    color: white;
+    font-size: 15px;
+    left: 40px;
+    position: absolute;
+    top: 0px;
+    text-shadow: -4px 0 4px black, 0 4px 4px black, 4px 0 4px black, 0 -4px 4px black;
+}
+
+#seat0 {
+    left: 300px;
+    top:  330px;
+}
+.seat0-button {
+  left: 423px;
+  top: 315px;
+}
+#seat0 .bet {
+    top: -20px;
+}
+
+#seat1 {
+    left: 50px;
+    top:  300px;
+}
+.seat1-button {
+    left: 218px;
+    top: 290px;
+}
+#seat1 .bet {
+    top: -20px;
+}
+
+#seat2 {
+    left:  -50px;
+    top: 155px;
+}
+.seat2-button {
+  left: 174px;
+  top: 235px;
+}
+#seat2 .bet {
+    top: 100px;
+}
+
+#seat3 {
+    left: 0px;
+    top:  0px;
+}
+.seat3-button {
+  left: 180px;
+  top: 140px;
+}
+#seat3 .bet {
+    top: 100px;
+}
+
+#seat4 {
+    left: 200px;
+    top:    -25px;
+}
+.seat4-button {
+  left: 322px;
+  top: 133px;
+}
+#seat4 .bet {
+    top: 100px;
+}
+
+#seat5 {
+    left: 400px;
+    top:    -25px;
+}
+.seat5-button {
+  left: 522px;
+  top: 133px;
+}
+#seat5 .bet {
+    top: 100px;
+}
+
+#seat6 {
+    left: 600px;
+    top:    0px;
+}
+.seat6-button {
+  left: 660px;
+  top: 141px;
+}
+#seat6 .bet {
+    top: 100px;
+}
+
+#seat7 {
+    left: 650px;
+    top:  155px;
+}
+.seat7-button {
+  left: 680px;
+  top: 235px;
+}
+#seat7 .bet {
+    top: 100px;
+}
+
+#seat8 {
+    left: 550px;
+    top:  300px;
+}
+.seat8-button {
+  left: 600px;
+  top: 325px;
+}
+#seat8 .bet {
+    top: -20px;
+}
+
+
+#board {
+  left: 242px;
+  position: absolute;
+  top: 169px;
+  background: white;
+}
+
+#pot {
+    color: white;
+    font-size: 16px;
+    left: 340px;
+    position: absolute;
+    text-align: center;
+    top: 245px;
+    font-size: 15px;
+    text-shadow: -4px 0 4px black, 0 4px 4px black, 4px 0 4px black, 0 -4px 4px black;
+}
+
+.boardcard {
+    height: 73px;
+    left: 0px;
+    background-image: none;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: -10px;
+    width: 50px;
+}
+
+#flop1 {
+}
+
+#flop2 {
+    left: 52px;
+}
+
+#flop3 {
+    left: 104px;
+}
+
+#turn {
+    left: 156px;
+}
+
+#river {
+    left: 208px;
+}
+
+#burn1 {
+    left: 280px;
+    transform: rotate(-18deg);
+}
+#burn2 {
+    left: 290px;
+}
+#burn3 {
+    left: 300px;
+    transform: rotate(15deg);
+}
+
+#action-options {
+    height: 40px;
+    width: 250px;
+    position: relative;
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom:10px;
+}
+
+.action-button {
+    background-color: silver;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    height: 30px;
+    padding: 10px 5px 0 5px;
+}
+
+#setup-options {
+    position: relative;
+    width: 170px;
+    display: flex;
+    flex-direction: column;
+    margin-right:17px;
+}
+
+.setup-button {
+    background-color: silver;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    height: 35px;
+    /*padding: 10px 5px 0px 5px;*/
+    text-align: center;
+    width: 170px;
+    margin-top:10px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+.setup-button:hover {
+    box-shadow: 3px 3px 4px #000000;
+}
+
+#speed-button {
+    cursor: default;
+    position: relative;
+}
+
+select {
+  background-color: silver;
+  background: silver;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 7px;
+  width: 2em;
+}
+
+#mode-button {
+    top: 100px;
+}
+
+#help-button {
+    top: 150px;
+}
+
+#check-button {
+    top: 200px;
+}
+
+#history {
+    border-color: black;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    font-size: 10px;
+    height: 600px;
+    left: 50px;
+    position: absolute;
+    top: 600px;
+    width: 400px;
+}
+
+#game-response {
+  border: none;
+  color: black;
+  font-size: 12px;
+  height: 100px;
+  text-align: center;
+  width: 500px;
+}
+
+#production-code {
+    color: black;
+    font-size: 10px;
+    height: 20px;
+    left: 900px;
+    position: absolute;
+    text-align: right;
+    top: 310px;
+    width: 600px;
+}
+
+.response-normal {
+    background-color: transparent;
+}
+
+
+.response-warning {
+    background-color: #FF0000;
+}
+
+#fold-button:hover {
+    box-shadow: 3px 3px 4px #000000;
+}
+
+#call-button {
+    left: 80px;
+}
+
+#call-button:hover {
+    box-shadow: 3px 3px 4px #000000;
+}
+
+#raise-button {
+    left: 160px;
+}
+
+#raise-button:hover {
+    box-shadow: 3px 3px 4px #000000;
+}
+
+#quick-raises {
+    background-color: silver;
+    border-radius: 4px;
+    font-size: 18px;
+    height: 75px;
+    text-align: center;
+    width: 350px;
+    margin-bottom:10px;
+}
+#quick-raises a:link {
+    color: white;
+    text-decoration: none;
+}
+#quick-raises a:hover {
+    color: white;
+    text-shadow: 3px 3px 4px #000000;
+}
+
+
+#modal-box {
+    background-color: silver;
+    display: none;
+    font-size: 12px;
+    height: 100%;
+    left: 0px;
+    overflow: auto; /* Enable scroll */
+    position: fixed;
+    text-align: center;
+    top: 0px;
+    width: 100%;
+    z-index: 1;  /* Stay on top */
+}
+
+#modal-box a:link {
+    color: white;
+    text-decoration: none;
+}
+#modal-box a:hover {
+    color: white;
+    text-shadow: 3px 3px 4px #000000;
+}

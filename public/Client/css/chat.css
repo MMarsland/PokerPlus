@@ -1,0 +1,94 @@
+#chat-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+#chat-wrapper #messageArea {
+  display: flex;
+  flex-direction: column;
+  height:95%;
+  width:100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  padding-right: 17px;
+  box-sizing: content-box;
+  padding-inline-start: 0px;
+}
+
+#chat-wrapper #messageArea > li{
+  margin-bottom: 3px;
+}
+
+/*
+#chat-wrapper .msg {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  box-sizing:border-box;
+  margin-bottom: 4px;
+}
+
+#chat-wrapper .admin-msg {
+  background: lightgrey;
+}
+
+#chat-wrapper .msg-name {
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+#chat-wrapper .msg-text {
+
+}*/
+
+#chat-wrapper #textArea {
+  display: flex;
+  flex-direction: row;
+  height:5%;
+  box-sizing:border-box;
+  margin-right: 17px;
+}
+
+#chat-wrapper #textArea > input {
+  width:100%;
+  box-sizing:border-box;
+}
+
+/*
+#chat-wrapper #textArea > button {
+  margin: 0;
+  width: 20%;
+  display:flex;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  box-sizing:border-box;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}*/
+
+.sysMsg {
+  color: gray;
+  font-size: 70%;
+  margin: 5px;
+  text-align: center;
+}
+
+.message.typing .messageBody {
+  color: gray;
+}
+
+.username {
+  font-weight: 700;
+  overflow: hidden;
+  margin-right: 15px;
+  padding: 1px;
+  text-align: right;
+  border-radius: 6px;
+  background: white;
+}

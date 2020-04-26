@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Server - Poker Plus</title>
+    <base href="/">
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <link rel="shortcut icon" href="Shared/images/chip.ico" />
+
+    <link rel="stylesheet" href="Shared/css/standards/phone.css" type="text/css" media="only screen and (max-width: 1400px)">
+    <link rel="stylesheet" href="Shared/css/standards/normalize.css" type="text/css">
+    <link rel="stylesheet" href="Shared/css/standards/text.css" type="text/css">
+    <link rel="stylesheet" href="Shared/css/standards/page.css" type="text/css">
+
+    <link rel="stylesheet" href="Shared/css/sidenav.css" />
+    <link rel="stylesheet" href="Shared/css/modal.css" />
+
+    <link rel="stylesheet" href="Server/css/page.css" type="text/css">
+    <link rel="stylesheet" href="Server/css/admin-box.css" type="text/css">
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="Server/js/server_main.js"></script>
+    <script src="Shared/js/sidenav.js"></script>
+    <script src="Shared/js/modal.js"></script>
+  </head>
+  <body>
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+      </div>
+    </div>
+    <div id="admin-box">
+      <div class="header">
+        Administration Box
+      </div>
+      <div class="area">
+        <button class="button" onclick="start_game()">Start Game</button>
+        <!--<button class="button" onclick="reset_server()">Reset Server</button>-->
+      </div>
+    </div>
+    <div id="pages">
+      <div id="main">
+        <div id="data-area">
+          <div class="data-row">
+            <div class="userId"><div class="title">UserId:</div><div class="value">6</div></div>
+            <div class="username"><div class="title">Username:</div><div class="value">ExampleName</div></div>
+            <div class="position"><div class="title">Position:</div><div class="value">9</div></div>
+            <div class="chips"><div class="title">Chips:</div><div class="value">420</div></div>
+            <div class="bet"><div class="title">Bet:</div><div class="value">0</div></div>
+            <div class="card1"><div class="title">Card1:</div><div class="value">d14</div></div>
+            <div class="card2"><div class="title">Card2:</div><div class="value">h14</div></div>
+            <div class="status"><div class="title">Status:</div><div class="value">READY</div></div>
+            <div class="round_status"><div class="title">Round_Status:</div><div class="value">"WAITING"</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

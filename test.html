@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TEST - Poker Plus</title>
+  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script>
+    function test() {
+      console.log("Starting Test");
+      let testObj = new TestClass();
+      testObj.testFunc();
+    }
+
+    class TestClass {
+      constructor() {
+        let variable = "test";
+        this.hair = "Green";
+      }
+
+      testFunc() {
+        console.log("testFunc")
+        //console.log(variable);
+        //console.log(hair);
+        console.log(this.hair);
+        this.otherFunc();
+        this.lastFunc();
+      }
+
+      lastFunc() {
+        console.log("Last Func");
+      }
+
+      otherFunc() {
+        console.log("OtherFunc");
+      }
+    }
+
+
+    let Data = {
+      players: {
+        0: {
+          userId: 0,
+          username: "Mike",
+          position: 0,
+          chips: 500,
+          bet: 0,
+          card1: null,
+          card2: null,
+          status: "IN",
+          round_status: "WAITING",
+        },
+        3: {
+          userId: 3,
+          username: "Alex",
+          position: 3,
+          chips: 500,
+          bet: 0,
+          card1: null,
+          card2: null,
+          status: "IN",
+          round_status: "WAITING",
+        },
+        4: {
+          userId: 4,
+          username: "Steve",
+          position: 1,
+          chips: 500,
+          bet: 0,
+          card1: null,
+          card2: null,
+          status: "FOLDED",
+          round_status: "WAITING",
+        },
+        5: {
+          userId: 5,
+          username: "Trev",
+          position: 2,
+          chips: 500,
+          bet: 0,
+          card1: null,
+          card2: null,
+          status: "IN",
+          round_status: "WAITING",
+        },
+      },
+      game: {
+        dealerPosition: 0,
+      }
+    }
+    let Globals = {
+      MAX_PLAYERS: 9,
+    }
+  </script>
+</head>
+<body>
+  <button onclick="test()">TEST</button>
+</body>
+</html>

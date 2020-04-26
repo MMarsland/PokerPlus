@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Client - Poker Plus</title>
+  <base href="/">
+  <link rel="shortcut icon" href="Shared/images/chip.ico" />
+  <link rel="stylesheet" href="Shared/css/standards/normalize.css" />
+  <link rel="stylesheet" href="Shared/css/standards/text.css" />
+  <link rel="stylesheet" href="Shared/css/standards/phone.css" />
+  <link rel="stylesheet" href="Shared/css/standards/page.css" />
+
+  <link rel="stylesheet" href="Client/css/chat.css" />
+  <link rel="stylesheet" href="Client/css/login.css" />
+  <link rel="stylesheet" href="Client/css/poker.css" />
+  <link rel="stylesheet" href="Shared/css/sidenav.css" />
+  <link rel="stylesheet" href="Shared/css/modal.css" />
+
+  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="Client/main.js"></script>
+  <script src="Shared/js/sidenav.js"></script>
+  <script src="Shared/js/modal.js"></script>
+
+</head>
+<body>
+  <!-- The Modal -->
+  <div id="myModal" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+    </div>
+  </div>
+  <ul class="pages">
+    <li class="page login">
+      <div class="form">
+        <h3 class="title">What's your username?</h3>
+        <input class="usernameInput" type="text" maxlength="14" />
+      </div>
+    </li>
+    <li class="page poker">
+      <!--<div class="chatArea">
+        <ul class="messages"></ul>
+      </div>-->
+      <!--<input class="inputMessage" placeholder="Type here..."/>-->
+      <div id="close" onclick="close()">X</div>
+      <div id="refresh" onclick="refresh()">O</div>
+      <div class="game">
+        <div id="poker_area">
+          <div id="poker_table" class="poker-table" data-uid="">
+              <div id="board">
+                  <div id="flop1" class="card boardcard"></div>
+                  <div id="flop2" class="card boardcard"></div>
+                  <div id="flop3" class="card boardcard"></div>
+                  <div id="turn" class="card boardcard"></div>
+                  <div id="river" class="card boardcard"></div>
+                  <div id="burn1" class="card boardcard"></div>
+                  <div id="burn2" class="card boardcard"></div>
+                  <div id="burn3" class="card boardcard"></div>
+              </div>
+              <div id="pot">
+              </div>
+          </div>
+          <div id="dealer-button" class="seat-button"></div>
+        </div>
+        <div id="action_area">
+          <div id="action-options">
+              <div id="fold-button" class="action-button" onclick="game_fold()">Fold</div>
+              <div id="check-button" class="action-button" onclick="game_check()">Check</div>
+              <div id="call-button" class="action-button" onclick="game_call()">Call</div>
+              <div id="raise-button" class="action-button" onclick="game_raise()">Raise</div>
+          </div>
+          <div id="quick-raises">Quick Raises</div>
+          <div id="game-response" class="response-normal">Game response</div>
+
+        </div>
+      </div>
+      <div class="other">
+        <div id="chat_area">
+          <div id="chat-wrapper">
+            <ul id="messageArea" class="messages">
+            </ul>
+            <div id="textArea">
+              <input id="chat-input" class="inputMessage" placeholder="Type here..." /><!--onkeypress="checkSend(event)"-->
+              <!--<button onclick="sendTheMessage()">Send</button>-->
+            </div>
+          </div>
+        </div>
+        <div id="settings_area">
+          <div id="setup-options">
+
+              <div id="name-button" class="setup-button" onclick="promptChangeNameModal()">Change Name</div>
+              <div id="speed-button" class="setup-button">Speed
+                 <div id="speed-selector">
+                    <select id="speed-options">
+                       <option value="0">1</option>
+                       <option value="1">2</option>
+                       <option value="2">3</option>
+                       <option value="3">4</option>
+                       <option value="4">5</option>
+                    </select>
+                 </div>
+              </div>
+              <div id="mode-button" class="setup-button" onclick="toggleMode()">Dark mode</div>
+              <div id="help-button" class="setup-button" onclick="openHelpWindow()">Help</div>
+              <div id="check-button" class="setup-button" onclick="openRespectWindow()">Pay Respects</div>
+          </div>
+          <!--<div id="history"></div>-->
+        </div>
+      </div>
+      <!--<div id="modal-box"></div>-->
+      <div id="mySidenav" class="sidenav">
+        <div id="mySidenavHandle" onclick="openSidenav()"><i class="arrow left"></i></div>
+        <div id="log-wrapper">
+          <ul id="logArea"></ul>
+        </div>
+      </div>
+    </li>
+  </ul>
+</body>
+</html>

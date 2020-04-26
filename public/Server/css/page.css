@@ -1,0 +1,80 @@
+#main {
+  height:100%;
+  width:100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  display: flex;
+}
+
+#data-area {
+  height: calc(90% - 10px);
+  border: 1px solid black;
+  width: calc(70% - 10px);
+  display:flex;
+  flex-direction:column;
+  margin-left: 10px;
+  margin-top: 10px;
+  box-sizing: border-box;
+}
+
+.data-row {
+  display: flex;
+  height:50px;
+  width:100%;
+  border:1px solid black;
+  border-width: 0px 0px 1px 0px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.title {
+  font-weight:bold;
+}
+.value {
+
+}
+
+.data-row > div {
+  border-left: 1px solid black;
+  padding: 5px;
+}
+.data-row > div :first-child {
+  border: 0px solid black;
+}
+
+.data-row .userId {
+
+}
+.data-row .username {
+
+}
+.data-row .position {
+
+}
+.data-row .chips {
+
+}
+.data-row .bet {
+
+}
+.data-row .card1 {
+
+}
+.data-row .card1 .value {
+  color:white;
+}
+.data-row .card1 .value:hover {
+  color: black;
+}
+.data-row .card2 .value {
+  color:white;
+}
+.data-row .card2 .value:hover {
+  color: black;
+}
+.data-row .status {
+
+}
+.data-row .round_status {
+
+}

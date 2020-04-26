@@ -1,0 +1,48 @@
+* {
+  box-sizing: border-box;
+}
+
+html, input {
+  font-family:
+    "HelveticaNeue-Light",
+    "Helvetica Neue Light",
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    "Lucida Grande",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+html, body {
+  height:100%;
+  width:100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+ul {
+  list-style: none;
+  word-wrap: break-word;
+  overflow: hidden;
+}
+
+/* Pages */
+
+.pages {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.page {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  overflow: hidden;
+}
