@@ -26,16 +26,16 @@ class HandComparer {
     let winners = this.get_winners(my_players);
     //translate that to playersData
     let winning_ids = [];
-    let best_hand;
+    let winner_data;
     for (let i=0;i<winners.length;i++) {
       if (winners[i]) {
         // This player has won!
-        best_hand = winners[i].hand_name;
+        winner_data = winners[i];
         winning_ids.push(my_players[i].id);
       }
     }
     // return info
-    return [winning_ids, best_hand];
+    return [winning_ids, winner_data];
   }
 
 

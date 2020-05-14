@@ -9,11 +9,14 @@ var modalOpen = false;
 // Logged in Variables (globals) todo clean and tidy
 var userId;
 var global_position;
+var current_player_data = {};
+var current_state = {};
 var num_of_players = 0;
 var global_action = "WAITING";
 let style_bg_color = 'White';
 let style_sysMsg_color= "grey";
 let style_msg_color = "black";
+let style_typing_color = "grey";
 let style_button_text = 'Dark mode';
 var socket = io();
 
@@ -46,7 +49,7 @@ $(function() {
 
   // Sets the client's username
   const setUsername = () => {
-    username = sys_cleanInput($usernameInput.val().trim());
+    username = $usernameInput.val();
 
     // If the username is valid
     if (username) {
@@ -100,8 +103,6 @@ function setUpSocketFunctions() {
   // Sends a chat message
   const sendMessage = () => {
     var message = $inputMessage.val();
-    // Prevent markup from being injected into the message
-    message = sys_cleanInput(message);
     // if there is a non-empty message and a socket connection
     if (message && connected) {
       $inputMessage.val('');
@@ -136,12 +137,13 @@ function setUpSocketFunctions() {
     var $messageBodyDiv = $('<span class="messageBody">')
       .text(data.message);
 
-    var typingClass = data.typing ? 'typing' : '';
+    let color = data.typing ? style_typing_color : style_msg_color;
+    console.log(color);
     var $messageDiv = $('<li class="message"/>')
       .data('username', data.username)
-      .addClass(typingClass)
+      .addClass(data.typing ? "typing" : "")
       .append($usernameDiv, $messageBodyDiv)
-      .attr('style', `color:${style_msg_color}`);
+      .attr('style', `color:${color}`);
 
     addMessageElement($messageDiv, options);
   }
@@ -342,8 +344,15 @@ function setUpSocketFunctions() {
     sysMsg('attempt to reconnect has failed');
   });
 
-  socket.on('log', (message) => {
-    log(message);
+  socket.on('log', (type, message) => {
+    if (type === "sys") {
+      sysMsg(message);
+    } else if (type === "log") {
+      log(message);
+    } else {
+      log(message);
+    }
+
   });
 
 
@@ -385,7 +394,7 @@ function setUpSocketFunctions() {
       gui_setChips(int_getLocationByPosition(data.position), data.chips);
     }
     if (updates.includes('bet')) {
-      gui_setBet(int_getLocationByPosition(data.position), data.bet);
+      gui_setBets(int_getLocationByPosition(data.position), data.bet, data.totalBet, data.status);
     }
     if (updates.includes('cards')) {
       gui_setCards(int_getLocationByPosition(data.position), data.card1, data.card2, (data.userId === userId), (data.status === "FOLDED"));
@@ -393,6 +402,10 @@ function setUpSocketFunctions() {
     if (updates.includes('status')) {
       if (data.status === "FOLDED") {
         gui_foldPlayer(data);
+      } else if (data.status === "ALL IN") {
+        gui_allInPlayer(data);
+      } else if (data.status === "BUST") {
+        gui_bustPlayer(data);
       }
     }
     if (updates.includes('remove')) {
@@ -408,8 +421,10 @@ function setUpSocketFunctions() {
       // This players turn
       // Show action and wait for response
       global_action = "WAITING";
+      current_player_data = playerData;
+      current_state = state;
       gui_highlightSeat(position, "gold");
-      gui_showActionOptions(state, playerData.bet);
+      gui_showActionOptions(state, playerData);
       game_startTurnTimeout(state);
     } else {
       // Some other players turns
@@ -451,6 +466,7 @@ function toggleMode() {
     style_bg_color = 'DimGray';
     style_sysMsg_color = "white";
     style_msg_color = "white";
+    style_typing_color = "#FFFFFF77";
 
     style_button_text = 'Light mode';
     mode = "dark";
@@ -459,6 +475,7 @@ function toggleMode() {
     style_bg_color = 'White';
     style_sysMsg_color = "grey";
     style_msg_color = "black";
+    style_typing_color = "grey";
 
     style_button_text = 'Dark mode';
     mode = "light";
@@ -473,6 +490,10 @@ function toggleMode() {
   let msgs = document.getElementsByClassName("message");
   for (var i = 0; i < msgs.length; i++) {
     msgs[i].style.color = style_msg_color;
+  }
+  let typingMsgs = document.getElementsByClassName("typing");
+  for (var i = 0; i < typingMsgs.length; i++) {
+    typingMsgs[i].style.color = style_typing_color;
   }
 
   // Other dark/light node things +improve
@@ -550,15 +571,74 @@ function game_check() {
   game_playerSendAction();
 }
 function game_call() {
-  global_action = "CALL"; // TODO just bet?
+  if (current_state.bet >= current_player_data.chips) {
+    global_action = "ALL IN";
+  } else {
+    global_action = "CALL";
+  }
   game_playerSendAction();
 }
 function game_raise() {
-  modalPrompt("What would you like to raise to?", "The value of the total bet...", "Raise", "Cancel", "raise_callback");
+  let minRaise = (current_state.phase == "PREFLOP" || current_state.phase == "FLOP") ? Math.max(current_state.bet, current_state.bigBlind) : (current_state.bet, current_state.bigBlind*2);
+  console.log(minRaise);
+  let html = `
+  <div class="msg-wrapper">What would you like to raise to?</div>
+  <div class="input-wrapper">
+    <input type="number" id="modalBetInput" onblur="syncRangeToInput()" value="${current_state.bet + minRaise}"/>
+    <input class="slider" type="range" id="modalBetRange" onchange="syncInputToRange()" min="${current_state.bet + minRaise}" max="${current_player_data.chips}" value="${current_state.bet + minRaise}"/>
+  </div>
+  <div class="button-wrapper">
+    <button id="modal-confirm" class="confirm-button" onclick="modal_callback(raise_callback, 'modalBetInput')">Raise</button>
+    <button class="decline-button" onclick="closeModal()">Cancel</button>
+  </div>
+  `;
+  openModalWithContent(html);
+}
+
+function syncInputToRange() {
+  let minRaise = (current_state.phase == "PREFLOP" || current_state.phase == "FLOP") ? Math.max(current_state.bet, current_state.bigBlind) : (current_state.bet, current_state.bigBlind*2);
+  let minBet = current_state.bet + minRaise;
+  if (document.getElementById("modalBetRange").value % current_state.bigBlind != 0) {
+    console.log("Rounding");
+    document.getElementById("modalBetRange").value = Math.round(document.getElementById("modalBetRange").value / current_state.bigBlind) * current_state.bigBlind;
+    if (document.getElementById("modalBetRange").value > current_player_data.chips) {
+      console.log("still to high");
+    	document.getElementById("modalBetRange").value = current_player_data.chips;
+    }
+  }
+  console.log("Fixed Bet: $"+document.getElementById("modalBetRange").value);
+
+  document.getElementById("modalBetInput").value = document.getElementById("modalBetRange").value;
+}
+function syncRangeToInput() {
+  let minRaise = (current_state.phase == "PREFLOP" || current_state.phase == "FLOP") ? Math.max(current_state.bet, current_state.bigBlind) : (current_state.bet, current_state.bigBlind*2);
+  let minBet = current_state.bet + minRaise;
+  // Fix Num
+  console.log("Syncing from Input to Range");
+  if (document.getElementById("modalBetInput").value > current_player_data.chips) {
+    console.log("Too High");
+  	document.getElementById("modalBetInput").value = current_player_data.chips;
+  } else if (document.getElementById("modalBetInput").value < minBet) {
+    console.log("Too LOW");
+    document.getElementById("modalBetInput").value = minBet;
+  } else if (document.getElementById("modalBetInput").value % current_state.bigBlind != 0) {
+    console.log("Rounding");
+    document.getElementById("modalBetInput").value = Math.round(document.getElementById("modalBetInput").value / current_state.bigBlind) * current_state.bigBlind;
+    if (document.getElementById("modalBetInput").value > current_player_data.chips) {
+      console.log("still to high");
+    	document.getElementById("modalBetInput").value = current_player_data.chips;
+    }
+  }
+  console.log("Fixed Bet: $"+document.getElementById("modalBetInput").value);
+  document.getElementById("modalBetRange").value = document.getElementById("modalBetInput").value;
 }
 
 function raise_callback(value) {
-  global_action = "BET"+value; // TODO raise amount from other options
+  if (value >= current_player_data.chips) {
+    global_action = "ALL IN";
+  } else {
+    global_action = "BET"+value; // TODO raise amount from other options
+  }
   game_playerSendAction();
 }
 
@@ -579,18 +659,28 @@ function gui_setDealerButtonLocation(location) {
   button.className = 'seat' + location + '-button';
 }
 
-function gui_showActionOptions(state, currentBet) {
+function gui_showActionOptions(state, playerData) {
   let actionArea = document.getElementById("action_area");
-  if (state.bet == 0 || state.bet === currentBet) {
-    let callButtonDiv = document.getElementById("call-button");
+  let raiseButtonDiv = document.getElementById("raise-button");
+  let callButtonDiv = document.getElementById("call-button");
+  let checkButtonDiv = document.getElementById("check-button");
+  checkButtonDiv.style.display = "block";
+  callButtonDiv.style.display = "block";
+  raiseButtonDiv.style.display = "block";
+
+  if (state.bet == 0 || state.bet === playerData.bet) {
+    // Check
     callButtonDiv.style.display = "none";
-    let checkButtonDiv = document.getElementById("check-button");
-    checkButtonDiv.style.display = "block";
   } else {
-    let checkButtonDiv = document.getElementById("check-button");
+    // Call
     checkButtonDiv.style.display = "none";
-    let callButtonDiv = document.getElementById("call-button");
-    callButtonDiv.style.display = "block";
+    if (state.bet >= playerData.chips) {
+      callButtonDiv.innerText = "All In ($"+playerData.chips+")";
+      // Hide Raise Button
+      raiseButtonDiv.style.display = "none";
+    } else {
+      callButtonDiv.innerText = "Call $"+state.bet;
+    }
   }
   actionArea.style.visibility = 'visible';
 }
@@ -602,6 +692,22 @@ function gui_hideActionOptions() {
 
 function gui_foldPlayer(data) {
   gui_setCards(int_getLocationByPosition(data.position), data.card1, data.card2, (data.userId === userId), true);
+  let seatDiv = document.getElementById("seat"+location);
+  let betDiv = int_getFirstChildByClassName(seatDiv, 'bet');
+  betDiv.textContent = `FOLDED`;
+}
+function gui_bustPlayer(data) {
+  gui_setCards(int_getLocationByPosition(data.position), null, null, (data.userId === userId), true);
+  let location = int_getLocationByPosition(data.position)
+  let seatDiv = document.getElementById("seat"+location);
+  let chipsDiv = int_getFirstChildByClassName(seatDiv, 'chips');
+  chipsDiv.innerHTML = "BUST";
+}
+function gui_allInPlayer(data) {
+  let location = int_getLocationByPosition(data.position)
+  let seatDiv = document.getElementById("seat"+location);
+  let betDiv = int_getFirstChildByClassName(seatDiv, 'bet');
+  betDiv.textContent += ` (ALL IN)`;
 }
 
 // Seat Operations
@@ -615,7 +721,7 @@ function gui_createSeat(location, name, chips, id) {
                 <div class="card holecard2"></div>
             </div>
             <div class="name-chips" style="height:35px; border: 1px solid gold;">
-                <div class="player-name">${name}</div>
+                <div class="player-name">${sys_cleanInput(name)}</div>
                 <div class="chips">${chips}</div>
                 <div class="userId" style="width:148px;">${id}</div>
             </div>
@@ -645,7 +751,7 @@ function gui_removeSeat(location) {
 function gui_setUsername(location, name) {
   let seatDiv = document.getElementById("seat"+location);
   let nameDiv = int_getFirstChildByClassName(seatDiv, 'player-name');
-  nameDiv.innerHTML = name;
+  nameDiv.innerText = name;
 }
 function gui_setCards(location, card1, card2, show, folded) {
   let seatDiv = document.getElementById("seat"+location);
@@ -662,16 +768,10 @@ function gui_setChips(location, chips) {
   let chipsDiv = int_getFirstChildByClassName(seatDiv, 'chips');
   chipsDiv.innerHTML = chips;
 }
-function gui_setBet(location, bet) {
-
+function gui_setBets(location, bet, totalBet, status) {
   let seatDiv = document.getElementById("seat"+location);
   let betDiv = int_getFirstChildByClassName(seatDiv, 'bet');
-  if (bet == null || bet == 0) {
-    betDiv.textContent = ``;
-  } else {
-    betDiv.textContent = `Bet: $${bet} (${bet})`;
-  }
-
+  betDiv.textContent = `Bet: $${bet} (${totalBet})`;
 }
 function gui_highlightSeat(location, color) {
   let seatDiv = document.getElementById("seat"+location);
@@ -829,8 +929,11 @@ function sys_sleep(ms) {
 
 // Non-game GUI
 function log(message) {
+  // todo DANGERIOUS html Insertion?
   console.log(message);
-  document.getElementById("logArea").innerHTML += `<li class="logMsg">${message}</li>`;
+  let logArea = document.getElementById("logArea");
+  logArea.innerHTML += `<li class="logMsg">${message}</li>`;
+  logArea.scrollTop = logArea.scrollHeight;
 }
 
 

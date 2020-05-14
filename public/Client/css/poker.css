@@ -32,7 +32,7 @@
   width:100%;
   display: flex;
   flex-direction: row;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .poker .game {
@@ -97,6 +97,8 @@
     height: 150px;
     position: absolute;
     width: 150px;
+    display: flex;
+    justify-content: center;
 }
 
 #dealer-button {
@@ -184,7 +186,7 @@
 .bet {
     color: white;
     font-size: 15px;
-    left: 40px;
+    width: max-content;
     position: absolute;
     top: 0px;
     text-shadow: -4px 0 4px black, 0 4px 4px black, 4px 0 4px black, 0 -4px 4px black;
@@ -375,7 +377,7 @@
     cursor: pointer;
     font-size: 18px;
     height: 30px;
-    padding: 10px 5px 0 5px;
+    padding: 5px 5px 0 5px;
 }
 
 #setup-options {
@@ -536,4 +538,16 @@ select {
 #modal-box a:hover {
     color: white;
     text-shadow: 3px 3px 4px #000000;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 15px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
 }

@@ -5,18 +5,19 @@ function modalPrompt(messageText, placeholderText, confirmText, declineText, con
       <input id="modalInput" placeholder="${placeholderText}"/>
     </div>
     <div class="button-wrapper">
-      <button id="modal-confirm" class="confirm-button" onclick="modal_callback(${confirmFuncName})">${confirmText}</button>
+      <button id="modal-confirm" class="confirm-button" onclick="modal_callback(${confirmFuncName}, 'modalInput')">${confirmText}</button>
       <button class="decline-button" onclick="closeModal()">${declineText}</button>
     </div>
   `;
 
   openModalWithContent(content);
-  $currentInput = $('#modalInput');
-  modalOpen = true;
 }
 
-function modal_callback(callback) {
-  let input = document.getElementById("modalInput").value;
+function modal_callback(callback, inputId) {
+  let input = undefined;
+  if (inputId != undefined) {
+    input = document.getElementById(inputId).value;
+  }
   closeModal();
   callback(input);
 }
@@ -26,6 +27,8 @@ function openModalWithContent(content) {
   modal.style.display = "block";
   console.log(modal.children);
   modal.children[0].innerHTML = content;
+  $currentInput = $('#modalInput');
+  modalOpen = true;
 }
 
 function closeModal() {
@@ -36,7 +39,7 @@ function closeModal() {
 }
 
 // When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
+window.onmousedown = function(event) {
   var modal = document.getElementById("myModal");
   if (event.target == modal) {
     modal.style.display = "none";

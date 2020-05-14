@@ -79,10 +79,6 @@
   text-align: center;
 }
 
-.message.typing .messageBody {
-  color: gray;
-}
-
 .username {
   font-weight: 700;
   overflow: hidden;

@@ -71,6 +71,7 @@ io.on('connection', (socket) => {
       position: position,
       chips: Globals.STARTING_CHIPS,
       bet: 0,
+      totalBet: 0,
       card1: null,
       card2: null,
       status: "READY",
@@ -205,9 +206,12 @@ function game_startGame() {
 // todo add startRound function
 function game_startHand(first) {
   game_setPlayersReady();
-  console.log("Starting Hand with "+game_getNumPlayersWithStatus("READY")+ " players");
+  console.log("Starting Hand with "+game_getNumPlayersWithStatus(["READY"])+ " players");
   game_setReadyPlayersIN();
-  let numINPlayers = game_getNumPlayersWithStatus("IN");
+  let numINPlayers = game_getNumPlayersWithStatus(["IN"]);
+  if (numINPlayers < 2) {
+    return;
+  }
   // Clean-up / Reset
   // PLAYER - BETS, CARDS, POT, etc...
   //resetPot();
@@ -233,24 +237,14 @@ function game_startHand(first) {
   let bigBlindPosition = game_getBigBlindPosition(Data.game.dealerPosition, numINPlayers);
 
   // Blinds
-  player_bet(help_getKeyFromPosition(smallBlindPosition), Data.game.smallBlindAmount);
-  player_bet(help_getKeyFromPosition(bigBlindPosition), Data.game.bigBlindAmount);
+  player_smallBlind(help_getKeyFromPosition(smallBlindPosition));
+  player_bigBlind(help_getKeyFromPosition(bigBlindPosition));
   round_data.currentBet = Data.game.bigBlindAmount;
   // Deal
   game_dealCards();
   // Turns
   // Betting Round
   game_startBettingRound(true);
-  //flop
-  // Betting Round
-  //turn
-  // Betting Round
-  //river
-  // Betting Round
-
-  // End - payouts, logging, data save?, cleanup, etc...
-
-  // repeat...
 }
 
 function game_dealCards() {
@@ -266,8 +260,14 @@ function game_dealCards() {
 }
 
 function game_startBettingRound(preFlop) {
-  let numINPlayers = game_getNumPlayersWithStatus("IN");
+  let numINPlayers = game_getNumPlayersWithStatus(["IN", "ALL IN"]);
   console.log("Number of players 'IN': "+ numINPlayers);
+  if (numINPlayers == 1) {
+    console.log("ENDING phase: "+round_data.phase+"!");
+    game_endRound(round_data.phase);
+    return;
+  }
+
   for (let key in Data.players) { let player = Data.players[key];
     Data.players[key].round_status = "WAITING";
     if (!preFlop) {
@@ -284,6 +284,8 @@ function game_startBettingRound(preFlop) {
   state = {
     bet: round_data.currentBet,
     timeout: Globals.TURN_TIMEOUT,
+    bigBlind: Data.game.bigBlindAmount,
+    phase: round_data.phase,
   }
 
   io.emit('player turn', currentPosition, Data.players[help_getKeyFromPosition(currentPosition)], state);
@@ -305,39 +307,39 @@ function game_continueBettingRound(position, action) {
   // Evaluate player action
   if (action === "FOLD") {
     player_fold(key);
-  } else if (action == "CHECK") {
+  } else if (action === "CHECK") {
     player_check(key);
-  } else if (action == "CALL") {
+  } else if (action === "CALL") {
     player_call(key);
+  } else if (action === "ALL IN") {
+    player_allIn(key);
   } else {
     // BET
+    // Could be ALL IN (todo)
     player_bet(key, parseInt(action.substring(3)));
   }
-  let numRemainingPlayers = game_getNumPlayersWithStatus("IN");
+  let numRemainingPlayers = game_getNumPlayersWithStatus(["IN", "ALL IN"]);
   if (numRemainingPlayers == 1) {
-    game_handWinner(help_getKeyFromPosition(help_getINPositions()[0]));
+    game_handWinner(game_getPlayersWithStatus(["IN", "ALL IN"])[0]);
     return;
-  }
-  // PICKUP
-  // Get next player (If there is one) and let them act
-  // Or end betting round and continue the game.
-  let nextPosition = game_getNextINPlayerPosition(position);
-  // Check if they've already acted (and have matched bet)
-  let nextPlayer = Data.players[help_getKeyFromPosition(nextPosition)];
-  console.log("Next Player: Position: "+nextPosition);
-  if ( nextPlayer.bet === round_data.currentBet && nextPlayer.round_status === "ACTED" ) {
-    // Everbody has acted (b?u?g)
-    console.log("ENDING phase: "+round_data.phase+"!");
-    game_endRound(round_data.phase);
-    return;
-  }
-  // This player hasn't gone yet
-  state = {
-    bet: round_data.currentBet,
-    timeout: Globals.TURN_TIMEOUT,
   }
 
-  io.emit('player turn', nextPosition, nextPlayer, state);
+  // Get next player to act (If there is one) or end betting round and continue the game.
+  let [nextPosition, nextPlayer] = game_getNextPlayerToAct(position);
+  if (nextPlayer === null) {
+    // No Players left to ACT
+    console.log("ENDING phase: "+round_data.phase+"!");
+    game_endRound(round_data.phase);
+  } else {
+    // This player hasn't gone yet
+    state = {
+      bet: round_data.currentBet,
+      timeout: Globals.TURN_TIMEOUT,
+      bigBlind: Data.game.bigBlindAmount,
+      phase: round_data.phase,
+    }
+    io.emit('player turn', nextPosition, nextPlayer, state);
+  }
 }
 
 function game_endRound(phase) {
@@ -362,13 +364,13 @@ function game_endRound(phase) {
       break;
     case "RIVER":
       // SHOWDOWN
-      log("SHOWDOWN");
+      log("log", "SHOWDOWN");
 
       // Get remaining players data (or hands)
-      let candidates = game_getINPlayersList();
+      let candidates = game_getPlayersWithStatus(["IN", "ALL IN"]);
       //Compare them and get the winning hand (or key)
       let comparer = new HC.HandComparer(Data.game.board);
-      let [winners, best_hand] = comparer.getWinnerKeys(candidates);
+      let [winners, winner_data] = comparer.getWinnerKeys(candidates);
 
       console.log("Winners: "+ winners);
       console.log(winners);
@@ -376,7 +378,12 @@ function game_endRound(phase) {
       // Award winner, (show hands),
       // todo split pots
       if (winners.length === 1) {
-        game_handWinner(winners[0], {hand_name: best_hand});
+        game_handWinner(winners[0], winner_data);
+      } else {
+        // Multiple winners.
+        // Give first max amount
+        // (if pot not empty, give next winner max amount, repeat)
+        // Pot empty, all winners paid, round over
       }
       return;
       break;
@@ -391,14 +398,16 @@ function game_endRound(phase) {
   game_startBettingRound(false);
 }
 
-function game_handWinner(winnerKey, handData) {
+function game_handWinner(winnerKey, winner_data) {
+  // FIRST WINNER (TAKE MAX FROM POT AND REPEAT)
   let player = Data.players[winnerKey];
-
-  log("The winner is "+player.username+"!");
-  if (handData != undefined) {
-    log(player.username+" wins $"+Data.game.pot+" with a "+handData.hand_name+"!");
+  console.log(winner_data);
+  log('log', winner_data);
+  //log("The winner is "+player.username+"!");
+  if (winner_data != undefined) {
+    log('sys', player.username+" wins $"+Data.game.pot+" with a "+winner_data.hand_name+"!");
   } else {
-    log(player.username+" wins $"+Data.game.pot+"!");
+    log('sys', player.username+" wins $"+Data.game.pot+"! All other players folded.");
   }
 
 
@@ -418,14 +427,18 @@ function game_endHand() {
   game_clearPlayerCards();
   // reset info?
   game_clearPlayerBets();
+  game_clearPlayerTotalBets();
   // Incriment hand count
+
+  // Bust broke players
+  game_bustBrokePlayers();
 
   game_startHand(false);
 }
 
 // Dealing Functions
 function game_dealFlop() {
-  log("Dealing Flop");
+  log('log', "Dealing Flop");
   // Burn Card
   let burnCard = round_data.cards.pop();
   // Deal 1, 2, 3
@@ -442,7 +455,7 @@ function game_dealFlop() {
   io.emit('deal flop', cards);
 }
 function game_dealTurn() {
-  log("Dealing Turn");
+  log('log', "Dealing Turn");
   // Burn Card
   let burnCard = round_data.cards.pop();
   // Deal 1, 2, 3
@@ -455,7 +468,7 @@ function game_dealTurn() {
   io.emit('deal turn', cards);
 }
 function game_dealRiver() {
-  log("Dealing River");
+  log('log', "Dealing River");
   // Burn Card
   let burnCard = round_data.cards.pop();
   // Deal 1, 2, 3
@@ -474,6 +487,12 @@ function game_clearPlayerBets() {
     io.emit('update player', ['bet'], Data.players[key]);
   }
 }
+function game_clearPlayerTotalBets() {
+  for (let key in Data.players) { let player = Data.players[key];
+    Data.players[key].totalBet = 0;
+    io.emit('update player', ['bet'], Data.players[key]);
+  }
+}
 function game_clearPlayerCards() {
   for (let key in Data.players) { let player = Data.players[key];
     Data.players[key].card1 = null;
@@ -484,6 +503,14 @@ function game_clearPlayerCards() {
 function game_clearBoardCards() {
   Data.game.board = [];
   io.emit('update game', ['board'], Data.game);
+}
+function game_bustBrokePlayers() {
+  for (let key in Data.players) { let player = Data.players[key];
+    if (Data.players[key].chips == 0 && Data.players[key].status != "BUST") {
+      Data.players[key].status = "BUST";
+      io.emit('update player', ['status'], Data.players[key]);
+    }
+  }
 }
 
 // GAME HELPER FUNCTIONS
@@ -529,38 +556,43 @@ function game_getBigBlindPosition(dealerPosition, numPlayers) {
   }
 }
 
-function game_getNumPlayersWithStatus(status) {
-  if (status === "ANY" || status === undefined || status === "") {
+function game_getNumPlayersWithStatus(stati) {
+  if (stati.includes("ANY") || stati === undefined || stati === null) {
     return Object.keys(Data.players).length;
   }
   let count = 0;
   for (let key in Data.players) { let player = Data.players[key];
-    if (player.status === status) {
+    if (stati.includes(player.status)) {
       count++
     }
   }
   return count;
 }
-
-function game_getINPlayersList() {
-  let positions = help_getINPositions();
+function game_getPlayersWithStatus(stati) {
   let players = [];
-  for (let position of positions) {
-    players.push(Data.players[help_getKeyFromPosition(position)]);
+  for (let key in Data.players) { let player = Data.players[key];
+    if (stati === undefined || stati === null || stati.includes("ANY") || stati.includes(player.status)) {
+      players.push(player);
+    }
   }
   return players;
 }
 
-// Helper FUNCTIONS
-function help_getINPositions() {
-  let inPositions = [];
-  for (let position in Data.positions) {
-    if (Data.players[help_getKeyFromPosition(position)].status === "IN") {
-      inPositions.push(+position);
-    }
+function game_getNextPlayerToAct(position) {
+  let nextPosition = game_getNextINPlayerPosition(position);
+  console.log("Next Player: Position: "+nextPosition);
+  if (nextPosition === null) {
+    return [null, null];
   }
-  return inPositions.sort(function(a, b){return a-b});
+  // Check if they've already acted (and have matched bet)
+  let nextPlayer = Data.players[help_getKeyFromPosition(nextPosition)];
+  if (nextPlayer.bet === round_data.currentBet && nextPlayer.round_status === "ACTED") {
+    return [null, null];
+  }
+  return [nextPosition, nextPlayer];
 }
+
+// Helper FUNCTIONS
 function help_getPlayersListSortedByPosition() {
   let players = Object.values(Data.players);
   let orderedPlayers = players.sort((a, b) => (a.position - b.position));
@@ -588,8 +620,7 @@ function help_getPositionFromPositionAndDistance(currPosition, distance) {
     }
     itrs++;
   }
-  console.log("NEXT PLAYER NOT FOUND!");
-  error("NEXT PLAYER NOT FOUND");
+  return null;
 }
 function help_getKeyFromPosition(position) {
 
@@ -608,31 +639,53 @@ function help_getKeyFromPosition(position) {
 // Player Actions
 function player_fold(key) {
   Data.players[key].status = "FOLDED";
-  Data.players[key].bet = null;
+  Data.players[key].bet = 0;
+  Data.players[key].totalBet = 0;
   io.emit('update player', ['status', 'bet'], Data.players[key]);
 }
-
 function player_check(key) {
 
 }
-
 function player_call(key) {
   player_bet(key, (round_data.currentBet - Data.players[key].bet));
 }
-
+function player_allIn(key) {
+  player_bet(key, Data.players[key].chips);
+  Data.players[key].status = "ALL IN";
+  io.emit('update player', ['status'], Data.players[key]);
+}
 function player_bet(key, amount) {
   console.log("making bet");
   Data.players[key].chips -= amount;
   Data.players[key].bet += amount;
+  Data.players[key].totalBet += amount;
   Data.game.pot += amount;
   round_data.currentBet = Data.players[key].bet;
   io.emit('update game', ['pot'], Data.game);
   io.emit('update player', ['chips', 'bet'], Data.players[key]);
 }
+function player_smallBlind(key) {
+  let chips = Data.players[key].chips;
+  let amount = Math.min(Data.game.smallBlindAmount, chips);
+  if (amount === chips) {
+    player_allIn(key);
+  } else {
+    player_bet(key, amount);
+  }
+}
+function player_bigBlind(key) {
+  let chips = Data.players[key].chips;
+  let amount = Math.min(Data.game.bigBlindAmount, chips);
+  if (amount === chips) {
+    player_allIn(key);
+  } else {
+    player_bet(key, amount);
+  }
+}
 
 // Log to client history
-function log(message) {
-  io.emit('log', message);
+function log(type, message) {
+  io.emit('log', type, message);
 }
 
 // General System Functions
