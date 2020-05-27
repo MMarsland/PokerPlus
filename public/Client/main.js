@@ -464,8 +464,8 @@ function toggleMode() {
   if (mode === "light") {
     // To dark
     style_bg_color = 'DimGray';
-    style_sysMsg_color = "white";
-    style_msg_color = "white";
+    style_sysMsg_color = "whitesmoke";
+    style_msg_color = "whitesmoke";
     style_typing_color = "#FFFFFF77";
 
     style_button_text = 'Light mode';
@@ -500,6 +500,9 @@ function toggleMode() {
 }
 function openHelpWindow() {
   var url = "Client/help.html";
+  if (mode == "dark") {
+    url += "?mode=dark";
+  }
   var win = window.open(url, '_blank');
   win.focus();
 }
@@ -717,8 +720,8 @@ function gui_createSeat(location, name, chips, id) {
     table.innerHTML += `
         <div id="seat${location}" class="seat" data.userId="${id}">
             <div class="holecards">
-                <div class="card holecard1"></div>
-                <div class="card holecard2"></div>
+                <div class="card holecard1 shown"></div>
+                <div class="card holecard2 shown"></div>
             </div>
             <div class="name-chips" style="height:35px; border: 1px solid gold;">
                 <div class="player-name">${sys_cleanInput(name)}</div>
@@ -852,7 +855,7 @@ function gui_setBackground(div, image, opacity) {
 
 // INTERNAL
 function int_getFirstChildByClassName(current, name) {
-  if (current.className === name) {
+  if (current.className != undefined && current.className != null && current.className.includes(name)) {
     return current;
   }
   var found = null;
@@ -929,7 +932,6 @@ function sys_sleep(ms) {
 
 // Non-game GUI
 function log(message) {
-  // todo DANGERIOUS html Insertion?
   console.log(message);
   let logArea = document.getElementById("logArea");
   logArea.innerHTML += `<li class="logMsg">${message}</li>`;

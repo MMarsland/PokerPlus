@@ -314,8 +314,6 @@ function game_continueBettingRound(position, action) {
   } else if (action === "ALL IN") {
     player_allIn(key);
   } else {
-    // BET
-    // Could be ALL IN (todo)
     player_bet(key, parseInt(action.substring(3)));
   }
   let numRemainingPlayers = game_getNumPlayersWithStatus(["IN", "ALL IN"]);

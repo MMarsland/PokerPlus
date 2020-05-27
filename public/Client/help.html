@@ -18,8 +18,18 @@
      margin-right: 50px;
    }
    </style>
+   <script>
+   function setMode() {
+     let params = new URLSearchParams(location.search);
+     let mode = params.get('mode');
+     if (mode && mode == "dark") {
+       document.body.style.background = "dimGray";
+       document.body.style.color = "whitesmoke";
+     }
+   }
+   </script>
 </head>
-<body>
+<body onload="setMode()">
 <pre>
 <b>Basic Gameplay</b>
 

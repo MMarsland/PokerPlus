@@ -13,35 +13,27 @@ Pre-Aplha
 ## HOW TO SET-UP:
 N/A - I'll write this when the app is actually functionally complete. Baby steps..
 
-Just posting this version so Trevor can experiement with adding video chat functionality.
+Just posting this version so Trevor can experiment with adding video chat functionality.
 
 ### TODO:
 
 __ In Progress:__
 - Required:
 Split Pot Functionality  
-Bet Checking (Negatives)
 Log In chat (Details (hand money)) Add More Logging!  
 Show Cards on Showdown (Show Card Options)
 
 __Bugs:__  
-AutoScroll Log on Update?
 
 __Todo:__  
 --FUNCTIONALITY--  
 
-
 - Desired:
-Card/Game History in server
+Card/Game History in server (Saving (Cash, Position, Dealer button position))
+Initial Dealer Position
+Card Sizing - Zoom
 
-Initial Dealer Position  
-Card Sizing - Zoom  
-
-Quick Raise Buttons  
-Call Button Amount  
-
-
-Break saving (Cash, Position, Dealer button position)  
+Quick Raise Buttons
 
 --GRAPHICS--  
 -Dealer Button Positions (check?)
@@ -51,4 +43,3 @@ __Improvements:__
 Hide Fold Button? (Eliminate Fold Option on Check)
 --GRAPHICS--  
 Bet Length (TOTAL BETS) and long bets overflow  
-FR: Dark Mode on Help Page  

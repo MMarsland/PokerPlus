@@ -154,6 +154,10 @@
     width: 53px;
 }
 
+.card.shown:hover {
+  background-size: 300%;
+}
+
 /* +improve fix magnify
 .card:hover {
   background-size: 150%;
