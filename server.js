@@ -29,9 +29,14 @@ app.get('/topsecretserver', function(req, res){
   res.sendFile(__dirname+'/public/server.html');
 });
 
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+const PORT = process.env.PORT || 8080;
+http.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}...`);
 });
+
+//http.listen(3000, function(){
+//  console.log('listening on *:3000');
+//});
 
 io.on('connection', (socket) => {
   var addedUser = false;
@@ -396,24 +401,23 @@ function game_endRound(phase) {
   game_startBettingRound(false);
 }
 
-function game_handWinner(winnerKey, winner_data) {
+function game_handWinner(winner, winner_data) {
   // FIRST WINNER (TAKE MAX FROM POT AND REPEAT)
-  let player = Data.players[winnerKey];
   console.log(winner_data);
   log('log', winner_data);
   //log("The winner is "+player.username+"!");
   if (winner_data != undefined) {
-    log('sys', player.username+" wins $"+Data.game.pot+" with a "+winner_data.hand_name+"!");
+    log('sys', winner.username+" wins $"+Data.game.pot+" with a "+winner_data.hand_name+"!");
   } else {
-    log('sys', player.username+" wins $"+Data.game.pot+"! All other players folded.");
+    log('sys', winner.username+" wins $"+Data.game.pot+"! All other players folded.");
   }
 
 
   // Give out pot to winner
-  Data.players[winnerKey].chips += Data.game.pot;
+  winner.chips += Data.game.pot;
   Data.game.pot = 0;
 
-  io.emit('update player', ['chips'], Data.players[winnerKey]);
+  io.emit('update player', ['chips'], winner);
   io.emit('update game', ['pot'], Data.game);
   // Start Next Hand
   game_endHand();

@@ -758,8 +758,8 @@ function gui_setUsername(location, name) {
 }
 function gui_setCards(location, card1, card2, show, folded) {
   let seatDiv = document.getElementById("seat"+location);
-  var card1Div = int_getFirstChildByClassName(seatDiv, 'card holecard1');
-  var card2Div = int_getFirstChildByClassName(seatDiv, 'card holecard2');
+  var card1Div = int_getFirstChildByClassName(seatDiv, 'holecard1');
+  var card2Div = int_getFirstChildByClassName(seatDiv, 'holecard2');
   let opacity = folded ? 0.5 : 1.0;
 
   gui_setBackground(card1Div, int_GetCardImageUrl(card1, show), opacity);
@@ -855,7 +855,7 @@ function gui_setBackground(div, image, opacity) {
 
 // INTERNAL
 function int_getFirstChildByClassName(current, name) {
-  if (current.className != undefined && current.className != null && current.className.includes(name)) {
+  if (current.className != undefined && current.className != null && current.className.split(" ").includes(name)) {
     return current;
   }
   var found = null;
